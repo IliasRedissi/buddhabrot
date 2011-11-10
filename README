@@ -1,0 +1,33 @@
+A very small but complete implementation of the Buddhabrot style rendering
+of Mandelbrot fractals. From wikipedia:
+
+"The Buddhabrot is a map related to the Mandelbrot set. Its name reflects
+its similarity to classical depictions of Gautama Buddha, seated in a
+meditation pose with a forehead mark (tikka) and traditional topknot
+(ushnisha).
+
+(...)
+
+...a random sampling of c points are iterated through the Mandelbrot function.
+For points which do escape within a chosen maximum number of iterations, and
+therefore are not in the Mandelbrot set, their values are sent through the
+Mandelbrot function again and this time its path is plotted into the array.
+After a large number of c values have been iterated, grayscale shades are then
+chosen based on the values recorded in the array."
+
+Currently implemented in gtk+ 2.0, so it should be completelly cross platform.
+Just compile it with default parameters and include gtk libs. In general:
+
+cc -std=c99 -o buddhabrot buddhabrot.c `pkg-config --cflags --libs gtk+-2.0`
+
+The program will spend some time generating the image, then show the
+final result.
+
+Play with the variables:
+	- R: number of random samples (random samples are tested to check if they
+	                               will be used for drawing the fractal, more
+	                               samples, more plots)
+	- M and m: minimum and maximum iterations (only samples that create a path
+	                               betweeen these lengths "inside" the fractal
+	                               are drawn)
+
