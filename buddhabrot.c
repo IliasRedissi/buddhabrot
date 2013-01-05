@@ -24,10 +24,11 @@
 #include <string.h>
 
 #define S 512
-guchar buff[S*S*3];
-unsigned gray[S*S];
+static guchar buff[S*S*3];
+static unsigned gray[S*S];
 
-gboolean on_darea_expose(GtkWidget *widget, GdkEventExpose *event, gpointer user_data)
+static gboolean on_darea_expose(GtkWidget *widget, GdkEventExpose *event,
+	gpointer user_data)
 {
 	gdk_draw_rgb_image(widget->window, widget->style->fg_gc[GTK_STATE_NORMAL],
 		0, 0, S, S, GDK_RGB_DITHER_NONE, buff, S*3);
@@ -48,7 +49,6 @@ int main (int argc, char *argv[])
 	unsigned max;
 	float complex z, c;
 
-	memset(gray, 0, sizeof(gray));
 	gtk_init(&argc, &argv);
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -87,9 +87,9 @@ int main (int argc, char *argv[])
 		if (gray[i] > max) max = gray[i];
 	}
 	for (i = 0; i < S*S; i++) {
-		buff[3*i] = 255*gray[i]/(float)max;
-		buff[3*i+1] = 255*gray[i]/(float)max;
-		buff[3*i+2] = 255*gray[i]/(float)max;
+		buff[3*i] = 255*gray[i]/max;
+		buff[3*i+1] = 255*gray[i]/max;
+		buff[3*i+2] = 255*gray[i]/max;
 	}
 
 	gtk_main();
