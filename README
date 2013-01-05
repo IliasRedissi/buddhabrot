@@ -18,7 +18,7 @@ chosen based on the values recorded in the array."
 Currently implemented in gtk+ 2.0, so it should be completelly cross platform.
 Just compile it with default parameters and include gtk libs. In general:
 
-cc -std=c99 -o buddhabrot buddhabrot.c `pkg-config --cflags --libs gtk+-2.0`
+cc -o buddhabrot buddhabrot.c `pkg-config --cflags --libs gtk+-2.0` -lm
 
 The program will spend some time generating the image, then show the
 final result.
