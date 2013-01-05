@@ -32,12 +32,13 @@ gboolean on_darea_expose(GtkWidget *widget, GdkEventExpose *event, gpointer user
 {
 	gdk_draw_rgb_image(widget->window, widget->style->fg_gc[GTK_STATE_NORMAL],
 	                   0, 0, S, S, GDK_RGB_DITHER_NONE, buff, S*3);
+
+	return TRUE;
 }
 
 int main (int argc, char *argv[])
 {
 	GtkWidget *window, *darea;
-	guchar *pos = buff;
 	float epsilon = 4.0/S;
 	float x, y;
 	unsigned jx, jy;
