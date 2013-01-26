@@ -15,10 +15,12 @@ Mandelbrot function again and this time its path is plotted into the array.
 After a large number of c values have been iterated, grayscale shades are then
 chosen based on the values recorded in the array."
 
-Currently implemented in gtk+ 2.0, so it should be completelly cross platform.
-Just compile it with default parameters and include gtk libs. In general:
+There are 2 versions, one implemented in gtk+ 2.0, the other in gtkmm 3.0,
+so it should be completelly cross platform. Just compile it with default
+parameters and include gtk libs. In general:
 
 cc -o buddhabrot buddhabrot.c `pkg-config --cflags --libs gtk+-2.0` -lm
+c++ -o buddhabrot++ buddhabrot.cc `pkg-config --cflags --libs gtkmm-3.0`
 
 The program will spend some time generating the image, then show the
 final result.
