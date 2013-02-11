@@ -21,6 +21,7 @@
 #include <complex>
 #include <cstdlib>
 #include <gtkmm.h>
+#include <atomic>
 
 using namespace Glib;
 using namespace Gtk;
@@ -34,7 +35,7 @@ static union {
 	guchar *b;
 };
 
-static unsigned gray[S*S];
+static atomic_uint gray[S*S];
 static Cairo::RefPtr<ImageSurface> surface;
 static int stride;
 void draw(void);
@@ -72,7 +73,7 @@ void buddhabrot(DrawingArea *darea)
 			for (j = 0; j < i-1; j++) {
 				jx = (real(z)+2.0)/epsilon;
 				jy = (imag(z)+2.0)/epsilon;
-				gray[jx*S+jy]++;
+				gray[jx*S+jy].fetch_add(1, memory_order_relaxed);
 				z = z*z + c;
 			}
 		}
@@ -90,12 +91,15 @@ void draw(void)
 
 	max = 0;
 	for (i = 0; i < S*S; i++) {
-		if (gray[i] > max) max = gray[i];
+		g = gray[i].load(memory_order_relaxed);
+		if (g > max) max = g;
 	}
 	for (i = 0; i < S; i++) {
 		k = stride*i/4;
 		for (j = 0; j < S; j++) {
-			g = 255*gray[i*S+j]/max;
+			g = gray[i*S+j].load(memory_order_relaxed);
+			g = min(g, max);
+			g = 255*g/max;
 			buff[k+j] = g<<16 | g<<8 | g;
 		}
 	}
