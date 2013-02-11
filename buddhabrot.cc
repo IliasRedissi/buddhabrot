@@ -38,6 +38,7 @@ static union {
 static atomic_uint gray[S*S];
 static Cairo::RefPtr<ImageSurface> surface;
 static int stride;
+static sigc::connection timeout;
 void draw(void);
 
 bool on_draw(const Cairo::RefPtr<Context>& cr)
@@ -47,11 +48,17 @@ bool on_draw(const Cairo::RefPtr<Context>& cr)
 	return true;
 }
 
-bool buddhabrot_done(DrawingArea *darea)
+bool update(DrawingArea *darea)
 {
 	draw();
 	darea->queue_draw();
+	return true;
+}
 
+bool buddhabrot_done(DrawingArea *darea)
+{
+	timeout.disconnect();
+	update(darea);
 	return false;
 }
 
@@ -130,6 +137,7 @@ int main(int argc, char *argv[])
 	b = new guchar[S*stride];
 	surface = ImageSurface::create(b, Cairo::FORMAT_RGB24, S, S, stride);
 	thread = Threads::Thread::create(sigc::bind(&buddhabrot, &darea));
+	timeout = signal_timeout().connect(sigc::bind(&update, &darea), 500);
 
 	r = app->run(window);
 	thread->join();
