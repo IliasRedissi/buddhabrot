@@ -37,6 +37,7 @@ static union {
 static unsigned gray[S*S];
 static Cairo::RefPtr<ImageSurface> surface;
 static int stride;
+void draw(void);
 
 bool on_draw(const Cairo::RefPtr<Context>& cr)
 {
@@ -45,7 +46,7 @@ bool on_draw(const Cairo::RefPtr<Context>& cr)
 	return true;
 }
 
-void buddhabrot(void)
+void buddhabrot(DrawingArea *darea)
 {
 	float epsilon = 4.0/S;
 	float x, y;
@@ -76,7 +77,10 @@ void buddhabrot(void)
 			}
 		}
 	}
+	draw();
 
+	// TODO: not thread safe
+	darea->queue_draw();
 }
 
 void draw(void)
@@ -105,6 +109,7 @@ int main(int argc, char *argv[])
 	RefPtr<Application> app = Application::create(argc, argv, "buddha.brot");
 	ApplicationWindow window;
 	DrawingArea darea;
+	Threads::Thread *thread;
 
 	window.add(darea);
 	darea.set_size_request(S, S);
@@ -113,13 +118,11 @@ int main(int argc, char *argv[])
 
 	stride = ImageSurface::format_stride_for_width(Cairo::FORMAT_RGB24, S);
 	b = new guchar[S*stride];
-
-	buddhabrot();
-	draw();
-
 	surface = ImageSurface::create(b, Cairo::FORMAT_RGB24, S, S, stride);
+	thread = Threads::Thread::create(sigc::bind(&buddhabrot, &darea));
 
 	r = app->run(window);
+	thread->join();
 	delete[] b;
 	return r;
 }
