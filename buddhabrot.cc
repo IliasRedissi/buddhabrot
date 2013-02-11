@@ -36,6 +36,7 @@ static union {
 
 static unsigned gray[S*S];
 static Cairo::RefPtr<ImageSurface> surface;
+static int stride;
 
 bool on_draw(const Cairo::RefPtr<Context>& cr)
 {
@@ -44,7 +45,7 @@ bool on_draw(const Cairo::RefPtr<Context>& cr)
 	return true;
 }
 
-int main(int argc, char *argv[])
+void buddhabrot(void)
 {
 	float epsilon = 4.0/S;
 	float x, y;
@@ -52,19 +53,8 @@ int main(int argc, char *argv[])
 	unsigned M = 1000;
 	unsigned m = 100;
 	unsigned R = 1500000;
-	unsigned i, j, k, g;
-	unsigned max;
+	unsigned i, j, k;
 	complex<float> z, c;
-	int stride, r;
-
-	RefPtr<Application> app = Application::create(argc, argv, "buddha.brot");
-	ApplicationWindow window;
-	DrawingArea darea;
-
-	window.add(darea);
-	darea.set_size_request(S, S);
-	darea.signal_draw().connect(sigc::ptr_fun(&on_draw));
-	darea.show();
 
 	for (k = 0; k < R; k++) {
 		x = 4.0*rand()/((float)RAND_MAX+1)-2.0;
@@ -87,8 +77,12 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	stride = ImageSurface::format_stride_for_width(Cairo::FORMAT_RGB24, S);
-	b = new guchar[S*stride];
+}
+
+void draw(void)
+{
+	unsigned i, j, k, g;
+	unsigned max;
 
 	max = 0;
 	for (i = 0; i < S*S; i++) {
@@ -101,6 +95,27 @@ int main(int argc, char *argv[])
 			buff[k+j] = g<<16 | g<<8 | g;
 		}
 	}
+
+}
+
+int main(int argc, char *argv[])
+{
+	int r;
+
+	RefPtr<Application> app = Application::create(argc, argv, "buddha.brot");
+	ApplicationWindow window;
+	DrawingArea darea;
+
+	window.add(darea);
+	darea.set_size_request(S, S);
+	darea.signal_draw().connect(sigc::ptr_fun(&on_draw));
+	darea.show();
+
+	stride = ImageSurface::format_stride_for_width(Cairo::FORMAT_RGB24, S);
+	b = new guchar[S*stride];
+
+	buddhabrot();
+	draw();
 
 	surface = ImageSurface::create(b, Cairo::FORMAT_RGB24, S, S, stride);
 
