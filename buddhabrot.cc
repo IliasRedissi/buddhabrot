@@ -47,6 +47,14 @@ bool on_draw(const Cairo::RefPtr<Context>& cr)
 	return true;
 }
 
+bool buddhabrot_done(DrawingArea *darea)
+{
+	draw();
+	darea->queue_draw();
+
+	return false;
+}
+
 void buddhabrot(DrawingArea *darea)
 {
 	float epsilon = 4.0/S;
@@ -78,10 +86,8 @@ void buddhabrot(DrawingArea *darea)
 			}
 		}
 	}
-	draw();
 
-	// TODO: not thread safe
-	darea->queue_draw();
+	signal_idle().connect(sigc::bind(&buddhabrot_done, darea));
 }
 
 void draw(void)
