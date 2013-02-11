@@ -72,10 +72,11 @@ void buddhabrot(DrawingArea *darea)
 	unsigned R = 1500000;
 	unsigned i, j, k;
 	complex<float> z, c;
+	Rand random;
 
 	for (k = 0; k < R; k++) {
-		x = 4.0*rand()/((float)RAND_MAX+1)-2.0;
-		y = 4.0*rand()/((float)RAND_MAX+1)-2.0;
+		x = 4.0*random.get_double()-2.0;
+		y = 4.0*random.get_double()-2.0;
 		i = 0;
 		c = complex<float>(x, y);
 		z = 0;
