@@ -20,7 +20,7 @@ so it should be completelly cross platform. Just compile it with default
 parameters and include gtk libs. In general:
 
 cc -o buddhabrot buddhabrot.c `pkg-config --cflags --libs gtk+-2.0` -lm
-c++ -o buddhabrot++ buddhabrot.cc `pkg-config --cflags --libs gtkmm-3.0`
+c++ -std=c++11 -o buddhabrot++ buddhabrot.cc `pkg-config --cflags --libs gtkmm-3.0`
 
 The program will spend some time generating the image, then show the
 final result.
