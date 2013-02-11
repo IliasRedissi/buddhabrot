@@ -22,6 +22,7 @@
 #include <cstdlib>
 #include <gtkmm.h>
 #include <atomic>
+#include <thread>
 
 using namespace Glib;
 using namespace Gtk;
@@ -62,14 +63,13 @@ bool buddhabrot_done(DrawingArea *darea)
 	return false;
 }
 
-void buddhabrot(DrawingArea *darea)
+void buddhabrot(unsigned R, DrawingArea *darea)
 {
 	float epsilon = 4.0/S;
 	float x, y;
 	unsigned jx, jy;
 	unsigned M = 1000;
 	unsigned m = 100;
-	unsigned R = 1500000;
 	unsigned i, j, k;
 	complex<float> z, c;
 	Rand random;
@@ -108,6 +108,9 @@ void draw(void)
 		g = gray[i].load(memory_order_relaxed);
 		if (g > max) max = g;
 	}
+
+	if (max == 0) return;
+
 	for (i = 0; i < S; i++) {
 		k = stride*i/4;
 		for (j = 0; j < S; j++) {
@@ -120,14 +123,25 @@ void draw(void)
 
 }
 
+static unsigned get_concurrency()
+{
+	unsigned c = thread::hardware_concurrency();
+	if (c == 0) c = 1;
+	return c;
+}
+
 int main(int argc, char *argv[])
 {
 	int r;
+	unsigned i, c;
+	unsigned R = 1500000;
 
 	RefPtr<Application> app = Application::create(argc, argv, "buddha.brot");
 	ApplicationWindow window;
 	DrawingArea darea;
-	Threads::Thread *thread;
+	c = get_concurrency();
+	R /= c;
+	Threads::Thread *thread[c];
 
 	window.add(darea);
 	darea.set_size_request(S, S);
@@ -137,11 +151,17 @@ int main(int argc, char *argv[])
 	stride = ImageSurface::format_stride_for_width(Cairo::FORMAT_RGB24, S);
 	b = new guchar[S*stride];
 	surface = ImageSurface::create(b, Cairo::FORMAT_RGB24, S, S, stride);
-	thread = Threads::Thread::create(sigc::bind(&buddhabrot, &darea));
+
+	for (i = 0; i < c; i++)
+		thread[i] = Threads::Thread::create(sigc::bind(&buddhabrot, R, &darea));
+
 	timeout = signal_timeout().connect(sigc::bind(&update, &darea), 500);
 
 	r = app->run(window);
-	thread->join();
+
+	for (i = 0; i < c; i++)
+		thread[i]->join();
+
 	delete[] b;
 	return r;
 }
