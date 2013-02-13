@@ -40,6 +40,7 @@ int main (int argc, char *argv[])
 {
 	GtkWidget *window, *darea;
 	float epsilon = 4.0/S;
+	const float factor=4.0f/((float)RAND_MAX+1.0f);
 	float x, y;
 	unsigned jx, jy;
 	unsigned M = 1000;
@@ -62,20 +63,20 @@ int main (int argc, char *argv[])
 	gtk_widget_show_all(window);
 
 	for (k = 0; k < R; k++) {
-		x = 4.0*rand()/((float)RAND_MAX+1)-2.0;
-		y = 4.0*rand()/((float)RAND_MAX+1)-2.0;
+		x = (float)rand()*factor-2.0f;
+		y = (float)rand()*factor-2.0f;
 		i = 0;
 		c = x + y*I;
 		z = 0;
-		while (cabsf(z) < 2 && i < M) {
+		while ((crealf(z)*crealf(z)+cimagf(z)*cimagf(z)) < 4.0f && i < M) {
 			z = z*z + c;
 			i++;
 		}
 		if (i < M && i > m) {
 			z = c;
 			for (j = 0; j < i-1; j++) {
-				jx = (creal(z)+2.0)/epsilon;
-				jy = (cimag(z)+2.0)/epsilon;
+				jx = (crealf(z)+2.0f)/epsilon;
+				jy = (cimagf(z)+2.0f)/epsilon;
 				gray[jx*S+jy]++;
 				z = z*z + c;
 			}

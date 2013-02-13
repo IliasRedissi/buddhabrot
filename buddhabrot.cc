@@ -79,16 +79,16 @@ void buddhabrot(unsigned R, DrawingArea *darea)
 		y = 4.0*random.get_double()-2.0;
 		i = 0;
 		c = complex<float>(x, y);
-		z = 0;
-		while (abs(z) < 2 && i < M) {
+		z = complex<float>(0.f, 0.f);
+		while ((real(z)*real(z)+imag(z)*imag(z)) < 4.0f && i < M) {
 			z = z*z + c;
 			i++;
 		}
 		if (i < M && i > m) {
 			z = c;
 			for (j = 0; j < i-1; j++) {
-				jx = (real(z)+2.0)/epsilon;
-				jy = (imag(z)+2.0)/epsilon;
+				jx = (real(z)+2.0f)/epsilon;
+				jy = (imag(z)+2.0f)/epsilon;
 				gray[jx*S+jy].fetch_add(1, memory_order_relaxed);
 				z = z*z + c;
 			}
